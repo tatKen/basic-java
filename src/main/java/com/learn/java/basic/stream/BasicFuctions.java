@@ -11,12 +11,12 @@ public class BasicFuctions {
         Stream<String> dummyStream = Stream.empty();
 
         if(dummyStream.count() == 0){
-            dummyStream = Stream.of("One", "Two", "Third");
+            dummyStream = Stream.of("One", "Two", "Third", "four", "five");
         }
 
-        dummyStream.forEach((t) -> String.format("append the String with %s", t));
+        dummyStream.forEach((t) -> System.out.println(String.format("append the String with %s", t)));
 
-        dummyStream.forEach((t) -> System.out.println(t));
+//        dummyStream.forEach((t) -> System.out.println(t));
     }
 
 }

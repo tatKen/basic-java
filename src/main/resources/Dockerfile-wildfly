@@ -1,0 +1,55 @@
+# learn basic docker
+#Use the latest version centos
+FROM centos:latest
+MAINTAINER http://www.centos.org
+
+LABEL Vendor="CentOS"
+LABEL License=GPLv2
+LABEL Version=8.2.0.Final
+
+# update base image
+RUN cd /etc/yum.repos.d/
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+RUN yum -y update && yum clean all
+
+# xmlstarlet is useful when modifying attributes/elements
+# saxon can be used to execute configuration transformation using XSLT
+# augeas is a great tool to edit any configuration files (XML too)
+# bsdtar can be used to unpack zip files using pipes
+RUN yum -y install tar java-11-openjdk-devel wget \
+    augeas bsdtar shadow-utils && yum clean all
+
+# ENV WILDFLY_VERSION=19.0.0.Final
+ENV WILDFLY_VERSION=19.0.0.Final
+
+# Create the wildfly user and group
+RUN groupadd -r wildfly -g 433 && useradd -u 431 -r -g wildfly -d /usr/app/wildfly -s /sbin/nologin -c "WildFly user" wildfly
+
+# Create directory to extract tar file to
+RUN mkdir -p /usr/app/wildfly-19.0.0.Final
+
+# Add the WildFly distribution to /usr/app, and make wildfly the owner of the extracted tar content
+# RUN cd /opt && curl http://download.jboss.org/wildfly/19.0.0.Final/wildfly-19.0.0.Final.tar.gz | tar zx && chown -R wildfly:wildfly /opt/wildfly-$WILDFLY_VERSION
+RUN cd /usr/app 
+RUN wget https://download.jboss.org/wildfly/19.0.0.Final/wildfly-19.0.0.Final.tar.gz -p /usr/app  
+RUN tar -xvf /usr/app/wildfly-19.0.0.Final.tar.gz -C /usr/app
+RUN chown -R wildfly:wildfly /usr/app/wildfly-19.0.0.Final
+
+# Make sure the distribution is available from a well-known place 
+RUN ln -s /usr/app/wildfly-19.0.0.Final /usr/app/wildfly && chown -R wildfly:wildfly /usr/app/wildfly
+
+# Set the JBOSS_HOME env variable
+ENV JBOSS_HOME=/usr/app/wildfly
+
+# Expose the ports we're interested in
+EXPOSE 8080 9201
+
+# Run everything below as the wildfly user
+USER wildfly
+
+# Set the default command to run on boot
+# This will boot WildFly in the standalone mode and bind to all interface
+# CMD ["/usr/app/wildfly/bin/standalone.sh", "-c", "standalone-full.xml", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+
+
