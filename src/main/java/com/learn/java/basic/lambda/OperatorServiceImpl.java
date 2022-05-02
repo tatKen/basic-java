@@ -34,14 +34,14 @@ public class OperatorServiceImpl {
 
         Predicate isTargetSplitter = isNameSame.and(isTypeSame);
 
-        UimCardModel card = new UimCardModel("ADMSTC097001S3", "S3");
+        UimCardModel card = new UimCardModel("ADMSTC097001S3", "S3", "S");
         if(isTargetSplitter.test(card)){
             System.out.println(String.format("[%s] This is the target splitter", card));
         } else {
             System.out.println(String.format("[%s] NO!!! This is NOT the target splitter", card));
         }
 
-        UimCardModel fakeCard = new UimCardModel("ADMSTC097001S3", "LOCALDP");
+        UimCardModel fakeCard = new UimCardModel("ADMSTC097001S3", "LOCALDP", "S");
         if(isTargetSplitter.test(fakeCard)){
             System.out.println(String.format("[%s] This is the target splitter", fakeCard));
         } else {
